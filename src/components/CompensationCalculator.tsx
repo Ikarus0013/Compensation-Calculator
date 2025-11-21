@@ -114,16 +114,17 @@ const CompensationCalculator: React.FC = () => {
 
     try {
       const canvas = await html2canvas(element, {
-        scale: 2, // Higher scale for better quality
+        scale: 1.5, // Reduced from 2 to 1.5 for smaller file size while maintaining readability
         useCORS: true,
-        backgroundColor: '#f9fafb', // Match bg-gray-50
+        backgroundColor: '#f9fafb',
       });
 
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL('image/jpeg', 0.7); // Use JPEG with 0.7 quality compression
       const pdf = new jsPDF({
         orientation: 'p',
         unit: 'mm',
         format: 'a4',
+        compress: true, // Enable PDF compression
       });
 
       const imgWidth = 210; // A4 width in mm
@@ -132,14 +133,14 @@ const CompensationCalculator: React.FC = () => {
       let heightLeft = imgHeight;
       let position = 0;
 
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
       heightLeft -= pageHeight;
 
       // Handle multi-page if content is long
       while (heightLeft >= 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
         heightLeft -= pageHeight;
       }
 
